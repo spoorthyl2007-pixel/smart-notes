@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }} — Smart Notes{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="card">
+
+    <!-- Header row -->
+    <div class="card-head">
+      <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;">
+        {% if note.category %}
+          <span class="note-cat-label"
+                style="background:{{ note.category.color }}; color:#fff;
+                       padding:.15rem .7rem; border-radius:999px;
+                       font-size:.78rem; font-weight:700;">
+            {{ note.category.name }}
+          </span>
+        {% endif %}
+        {% if note.is_pinned %}
+          <span style="font-size:.85rem;">📌 Pinned</span>
+        {% endif %}
+      </div>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+        <a href="{{ url_for('edit_note', note_id=note.id) }}" class="btn btn-outline">✏️ Edit</a>
+        <a href="{{ url_for('dashboard') }}"                  class="btn btn-outline">← Back</a>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="view-title">{{ note.title }}</h1>
+
+    <!-- Meta -->
+    <div class="view-meta">
+      <span>Created: {{ note.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+      {% if note.updated_at and note.updated_at != note.created_at %}
+        <span>Updated: {{ note.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Content -->
+    <div class="view-body">{{ note.content }}</div>
+
+    <!-- Delete -->
+    <div class="view-foot">
+      <form method="POST"
+            action="{{ url_for('delete_note', note_id=note.id) }}"
+            onsubmit="return confirmDelete()">
+        <button type="submit" class="btn btn-danger">🗑️ Delete Note</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

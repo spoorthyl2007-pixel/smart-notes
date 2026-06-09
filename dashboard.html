@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Smart Notes{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+
+  <!-- ── Sidebar ───────────────────────────────────────────── -->
+  <aside class="sidebar">
+
+    <div class="sb-section">
+      <p class="sb-heading">Overview</p>
+      <div class="stat-box">
+        <span class="stat-num">{{ total_notes }}</span>
+        <span class="stat-label">Total Notes</span>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <p class="sb-heading">Categories</p>
+      <ul class="cat-nav">
+
+        <!-- All notes -->
+        <li>
+          <a href="{{ url_for('dashboard') }}"
+             class="cat-nav-link {% if not selected_category %}active{% endif %}">
+            <span class="cat-dot" style="background:#6c757d"></span>
+            All Notes
+            <span class="cat-count">{{ total_notes }}</span>
+          </a>
+        </li>
+
+        {% for cat in categories %}
+        <li>
+          <a href="{{ url_for('dashboard', category=cat.id) }}"
+             class="cat-nav-link {% if selected_category == cat.id %}active{% endif %}">
+            <span class="cat-dot" style="background:{{ cat.color }}"></span>
+            {{ cat.name }}
+            <span class="cat-count">
+              {{ cat.notes | selectattr('user_id','equalto',current_user.id) | list | length }}
+            </span>
+          </a>
+        </li>
+        {% endfor %}
+
+      </ul>
+      <a href="{{ url_for('categories') }}" class="manage-link">Manage categories →</a>
+    </div>
+
+  </aside>
+
+  <!-- ── Notes area ────────────────────────────────────────── -->
+  <section class="notes-area">
+
+    <!-- Search bar -->
+    <form method="GET" action="{{ url_for('dashboard') }}" class="search-bar" id="searchForm">
+      {% if selected_category %}
+        <input type="hidden" name="category" value="{{ selected_category }}" />
+      {% endif %}
+
+      <div class="search-field-wrap">
+        <span class="search-icon-el">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          name="q"
+          class="search-input"
+          placeholder="Search notes by title or content…"
+          value="{{ query }}"
+          autocomplete="off"
+        />
+        {% if query %}
+          <a href="{{ url_for('dashboard', category=selected_category) }}" class="clear-btn">✕</a>
+        {% endif %}
+        <!-- Autocomplete dropdown -->
+        <ul class="autocomplete-list" id="autocompleteList"></ul>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Search</button>
+      <a href="{{ url_for('new_note') }}" class="btn btn-success">+ New Note</a>
+    </form>
+
+    <!-- Results info -->
+    <div class="results-bar">
+      {% if query %}
+        {{ notes | length }} result(s) for <strong>"{{ query }}"</strong>
+      {% elif selected_category %}
+        {% for cat in categories %}{% if cat.id == selected_category %}
+          Category: <span class="cat-pill" style="background:{{ cat.color }}">{{ cat.name }}</span>
+        {% endif %}{% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Notes grid -->
+    {% if notes %}
+    <div class="notes-grid">
+      {% for note in notes %}
+      <div class="note-card {% if note.is_pinned %}pinned{% endif %}">
+
+        <div class="note-card-top">
+          {% if note.category %}
+            <span class="note-cat-label" style="background:{{ note.category.color }}">
+              {{ note.category.name }}
+            </span>
+          {% endif %}
+          {% if note.is_pinned %}
+            <span class="pin-badge">📌</span>
+          {% endif %}
+        </div>
+
+        <h3 class="note-title">
+          <a href="{{ url_for('view_note', note_id=note.id) }}">{{ note.title }}</a>
+        </h3>
+
+        <p class="note-snippet">
+          {{ note.content[:130] }}{% if note.content | length > 130 %}…{% endif %}
+        </p>
+
+        <div class="note-footer">
+          <span class="note-date">{{ note.updated_at.strftime('%b %d, %Y') }}</span>
+          <div class="note-actions">
+            <button
+              class="icon-btn"
+              title="{% if note.is_pinned %}Unpin{% else %}Pin{% endif %}"
+              onclick="togglePin({{ note.id }}, this)">📌</button>
+            <a href="{{ url_for('edit_note', note_id=note.id) }}"
+               class="icon-btn" title="Edit">✏️</a>
+            <form method="POST"
+                  action="{{ url_for('delete_note', note_id=note.id) }}"
+                  style="display:inline"
+                  onsubmit="return confirmDelete()">
+              <button type="submit" class="icon-btn del" title="Delete">🗑️</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🗒️</div>
+      <h3>No notes found</h3>
+      <p>
+        {% if query %}
+          Try a different search term.
+        {% else %}
+          Create your first note to get started!
+        {% endif %}
+      </p>
+      <a href="{{ url_for('new_note') }}" class="btn btn-primary">+ Create Note</a>
+    </div>
+    {% endif %}
+
+  </section>
+</div>
+{% endblock %}

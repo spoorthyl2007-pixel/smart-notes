@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{% if note %}Edit Note{% else %}New Note{% endif %} — Smart Notes{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-head">
+      <h2>{% if note %}✏️ Edit Note{% else %}📝 New Note{% endif %}</h2>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Back</a>
+    </div>
+
+    <!-- Form -->
+    <form method="POST" class="note-editor" novalidate>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label for="title">Title <span class="req">*</span></label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          class="form-input"
+          placeholder="Give your note a clear title…"
+          value="{{ note.title if note else '' }}"
+          required
+          autofocus
+        />
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="category_id">Category</label>
+        <select id="category_id" name="category_id" class="form-input form-select">
+          <option value="">— No category —</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}"
+            {% if note and note.category_id == cat.id %}selected{% endif %}>
+            {{ cat.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Content -->
+      <div class="form-group">
+        <label for="content">Content <span class="req">*</span></label>
+
+        <!-- Mini toolbar -->
+        <div class="toolbar">
+          <button type="button" onclick="wrapText('**','**')" title="Bold"><b>B</b></button>
+          <button type="button" onclick="wrapText('*','*')"   title="Italic"><i>I</i></button>
+          <button type="button" onclick="wrapText('`','`')"   title="Code">{ }</button>
+          <button type="button" onclick="insertBullet()"      title="Bullet list">• List</button>
+          <span class="char-info" id="charInfo">0 characters</span>
+        </div>
+
+        <textarea
+          id="content"
+          name="content"
+          class="form-input form-textarea"
+          placeholder="Write your note here…"
+          required
+        >{{ note.content if note else '' }}</textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          {% if note %}Save Changes{% else %}Create Note{% endif %}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

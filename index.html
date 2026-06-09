@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Smart Notes — Organize Your Thoughts{% endblock %}
+
+{% block content %}
+<div class="landing">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-emoji">📝</div>
+    <h1 class="hero-title">Your Notes.<br>Organized Smartly.</h1>
+    <p class="hero-sub">
+      Create, search, and categorize all your notes in one clean workspace.
+      Pin what matters. Find anything instantly.
+    </p>
+    <div class="hero-btns">
+      <a href="{{ url_for('signup') }}" class="btn btn-primary btn-lg">Get Started — It's Free</a>
+      <a href="{{ url_for('login') }}"  class="btn btn-outline btn-lg">Log In</a>
+    </div>
+  </section>
+
+  <!-- Feature cards -->
+  <div class="features">
+    <div class="feat-card">
+      <div class="feat-icon">🔍</div>
+      <h3>Instant Search</h3>
+      <p>Find any note by title or content in real time with live autocomplete.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🗂️</div>
+      <h3>Subject Categories</h3>
+      <p>Color-coded labels keep Personal, Work, Study, and more neatly separated.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📌</div>
+      <h3>Pin Important Notes</h3>
+      <p>One click pins your most critical notes right to the top of the dashboard.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <h3>Private & Secure</h3>
+      <p>Every note is tied to your personal account with hashed passwords.</p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

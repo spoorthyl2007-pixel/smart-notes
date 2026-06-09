@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Categories — Smart Notes{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-head">
+      <h2>🗂️ Manage Categories</h2>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Dashboard</a>
+    </div>
+
+    <!-- Add new category -->
+    <form method="POST" action="{{ url_for('categories') }}" class="inline-add" novalidate>
+      <input
+        type="text"
+        name="name"
+        class="form-input"
+        placeholder="New category name…"
+        required
+      />
+      <div class="color-row">
+        <label for="colorPick">Color:</label>
+        <input type="color" id="colorPick" name="color" value="#4f46e5" class="color-pick" />
+      </div>
+      <button type="submit" class="btn btn-primary">Add Category</button>
+    </form>
+
+    <!-- Category table -->
+    {% if categories %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Color</th>
+            <th>Name</th>
+            <th>Notes</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in categories %}
+          <tr>
+            <td><span class="swatch" style="background:{{ cat.color }}"></span></td>
+            <td><strong>{{ cat.name }}</strong></td>
+            <td>
+              {{ cat.notes | selectattr('user_id','equalto',current_user.id) | list | length }}
+            </td>
+            <td>
+              <form method="POST"
+                    action="{{ url_for('delete_category', cat_id=cat.id) }}"
+                    onsubmit="return confirm('Delete \'{{ cat.name }}\'? Notes will be uncategorized.')">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <p>No categories yet. Add one above!</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
